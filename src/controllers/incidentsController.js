@@ -16,16 +16,26 @@ module.exports = {
   },
 
   async index(req, res) {
-    const incidents = await connectionDB('incidents').select('*');
+    const { page = 1 } = req.query;
+
+    const [count] = await connectionDB('incidents').count();
+
+    const incidents = await connectionDB('incidents')
+      .join('ongs', 'incidents.ong_id', '=', 'ongs.id')
+      .limit(5)
+      .offset((page - 1) * 5)
+      .select([
+        'incidents.*',
+        'ongs.name',
+        'ongs.email',
+        'ongs.city',
+        'ongs.uf',
+        'ongs.whatsapp'
+      ]);
 
     //return res.json(incidents);
-
-    return res.json(
-      incidents.map(incidents => {
-        const { id, ong_id, title } = incidents;
-        return { id, ong_id, title };
-      })
-    );
+    res.header('X-Total-Count', count['count(*)']);
+    return res.json({ incidents });
   },
 
   async delete(req, res) {
@@ -42,8 +52,8 @@ module.exports = {
     //   return res.status(401).json('Unhauthorized operation');
     // }
 
-    if (ong_verify === undefined){
-      return res.status(400).json({error:'bad request'})
+    if (ong_verify === undefined) {
+      return res.status(400).json({ error: 'bad request' });
     }
     if (ong_verify.ong_id != ong_id_header) {
       return res.status(401).json('Unhauthorized operation');
@@ -53,6 +63,6 @@ module.exports = {
       .where('id', id)
       .delete();
 
-    return res.status(204).json({ 'result': 'ok' });
+    return res.status(204).json({ result: 'ok' });
   }
 };

@@ -2,14 +2,14 @@ const express = require('express');
 
 const ongsController = require('./controllers/ongsController');
 const incidentsController = require('./controllers/incidentsController');
-const profileOngController = require('./controllers/profileOngController')
-const sessionController = require('./controllers/SessionController')
+const profileOngController = require('./controllers/profileOngController');
+const sessionController = require('./controllers/SessionController');
 
 const routes = express.Router();
 
 // login
 
-routes.post('/sessions/', sessionController.store)
+routes.post('/sessions/', sessionController.store);
 
 // ongs
 
@@ -23,9 +23,11 @@ routes.get('/incidents', incidentsController.index);
 
 routes.post('/incidents', incidentsController.store);
 
-routes.delete('/incidents/:id', incidentsController.delete)
+routes.delete('/incidents/:id', incidentsController.delete);
 
 //profile incidents
 
 routes.get('/incidents/:id', profileOngController.index);
+routes.get('/profile', profileOngController.index_of);
+
 module.exports = routes;

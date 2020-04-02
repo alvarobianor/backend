@@ -18,7 +18,7 @@ module.exports = {
     if (ong_verify === undefined) {
       return res.status(400).json({ error: 'bad request' });
     }
-    if (ong_verify.ong_id != ong_id_header) {
+    if (ong_verify.ong_id !== ong_id_header) {
       return res.status(401).json('Unhauthorized operation');
     }
 
@@ -26,8 +26,17 @@ module.exports = {
       .where('id', id)
       .first();
 
-    console.log(incident);
+    //console.log(incident);
 
-    res.status(200).json({ incident });
+    res.status(200).json({ result: incident });
+  },
+  async index_of(req, res) {
+    const ong_id_header = req.headers.authorization;
+
+    const incidentsOng = await connectionDB('incidents')
+      .where('ong_id', ong_id_header)
+      .select('*');
+
+    return res.status(200).json({ list_incidents: incidentsOng });
   }
 };
